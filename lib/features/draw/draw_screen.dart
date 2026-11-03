@@ -181,7 +181,8 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
     final poolCols = max(1, ((w - _gap) / (_poolCardW + _gap)).floor());
     final poolRows = (n / poolCols).ceil();
     final poolH = poolRows * (_cardH + _gap) + _gap;
-    Offset poolPos(int i) => Offset(_gap + (i % poolCols) * (_poolCardW + _gap), _gap + (i ~/ poolCols) * (_cardH + _gap));
+    late final double poolTop;
+    Offset poolPos(int i) => Offset(_gap + (i % poolCols) * (_poolCardW + _gap), poolTop + (i ~/ poolCols) * (_cardH + _gap));
 
     // Group boxes.
     const minColW = 170.0;
@@ -189,10 +190,10 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
     final colW = (w - _gap * (cols + 1)) / cols;
     final maxMembers = _assignment.fold<int>(0, (m, l) => max(m, l.length));
     final boxH = _headerH + maxMembers * (_cardH + _cardGap) + 8;
-    final groupsTop = poolH + 8;
-    Offset boxPos(int gi) => Offset(_gap + (gi % cols) * (colW + _gap), groupsTop + (gi ~/ cols) * (boxH + _gap));
+        Offset boxPos(int gi) => Offset(_gap + (gi % cols) * (colW + _gap), _gap + (gi ~/ cols) * (boxH + _gap));
     final groupRows = (g / cols).ceil();
-    final totalH = max(viewH, groupsTop + groupRows * (boxH + _gap) + _gap);
+    poolTop = groupRows * (boxH + _gap) + _gap + 8;
+    final totalH = max(viewH, poolTop + poolH);
 
     // Target slot per student.
     final slot = <int, (int, int)>{};
