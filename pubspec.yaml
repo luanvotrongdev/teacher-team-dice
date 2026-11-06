@@ -55,6 +55,7 @@ dev_dependencies:
   flutter_lints: ^6.0.0
   drift_dev: ^2.35.2
   build_runner: ^2.17.1
+  flutter_launcher_icons: ^0.14.4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -97,3 +98,18 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
+
+# App icons for every platform, made from one 1024x1024 image.
+# Regenerate after changing it: dart run flutter_launcher_icons
+flutter_launcher_icons:
+  image_path: assets/icon/app_icon.png
+  android: false
+  ios: true
+  remove_alpha_ios: true
+  web:
+    generate: true
+    background_color: "#3F51B5"
+    theme_color: "#3F51B5"
+  windows:
+    generate: true
+    icon_size: 256

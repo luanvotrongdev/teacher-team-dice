@@ -22,6 +22,7 @@ flutter test                  # all tests
 flutter test test/tools/word_lottery/core_test.dart                       # one file
 flutter test test/tools/team_dice/core_test.dart --plain-name 'assignEvenly'   # one test by name
 dart run build_runner build   # regenerate lib/shared/database/app_database.g.dart after changing any tables
+dart run flutter_launcher_icons   # regenerate iOS/Web/Windows icons from assets/icon/app_icon.png (then revert any ios/Runner.xcodeproj change it makes)
 flutter build windows
 flutter build web
 flutter build ios --simulator --debug   # quick iOS compile check, no signing needed
