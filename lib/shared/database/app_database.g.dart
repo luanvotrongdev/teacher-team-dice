@@ -1173,6 +1173,611 @@ class MembersCompanion extends UpdateCompanion<Member> {
   }
 }
 
+class $LotteryQuizzesTable extends LotteryQuizzes
+    with TableInfo<$LotteryQuizzesTable, LotteryQuizRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LotteryQuizzesTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, createdAt];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lottery_quizzes';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LotteryQuizRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_createdAtMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LotteryQuizRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LotteryQuizRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $LotteryQuizzesTable createAlias(String alias) {
+    return $LotteryQuizzesTable(attachedDatabase, alias);
+  }
+}
+
+class LotteryQuizRow extends DataClass implements Insertable<LotteryQuizRow> {
+  final int id;
+  final String name;
+  final DateTime createdAt;
+  const LotteryQuizRow({
+    required this.id,
+    required this.name,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  LotteryQuizzesCompanion toCompanion(bool nullToAbsent) {
+    return LotteryQuizzesCompanion(
+      id: Value(id),
+      name: Value(name),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory LotteryQuizRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LotteryQuizRow(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  LotteryQuizRow copyWith({int? id, String? name, DateTime? createdAt}) =>
+      LotteryQuizRow(
+        id: id ?? this.id,
+        name: name ?? this.name,
+        createdAt: createdAt ?? this.createdAt,
+      );
+  LotteryQuizRow copyWithCompanion(LotteryQuizzesCompanion data) {
+    return LotteryQuizRow(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LotteryQuizRow(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LotteryQuizRow &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.createdAt == this.createdAt);
+}
+
+class LotteryQuizzesCompanion extends UpdateCompanion<LotteryQuizRow> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<DateTime> createdAt;
+  const LotteryQuizzesCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  LotteryQuizzesCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required DateTime createdAt,
+  }) : name = Value(name),
+       createdAt = Value(createdAt);
+  static Insertable<LotteryQuizRow> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  LotteryQuizzesCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<DateTime>? createdAt,
+  }) {
+    return LotteryQuizzesCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LotteryQuizzesCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
+class $LotteryWordsTable extends LotteryWords
+    with TableInfo<$LotteryWordsTable, LotteryWordRow> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $LotteryWordsTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _quizIdMeta = const VerificationMeta('quizId');
+  @override
+  late final GeneratedColumn<int> quizId = GeneratedColumn<int>(
+    'quiz_id',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES lottery_quizzes (id) ON DELETE CASCADE',
+    ),
+  );
+  static const VerificationMeta _columnIndexMeta = const VerificationMeta(
+    'columnIndex',
+  );
+  @override
+  late final GeneratedColumn<int> columnIndex = GeneratedColumn<int>(
+    'column_index',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _positionMeta = const VerificationMeta(
+    'position',
+  );
+  @override
+  late final GeneratedColumn<int> position = GeneratedColumn<int>(
+    'position',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _wordMeta = const VerificationMeta('word');
+  @override
+  late final GeneratedColumn<String> word = GeneratedColumn<String>(
+    'word',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    quizId,
+    columnIndex,
+    position,
+    word,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'lottery_words';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<LotteryWordRow> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('quiz_id')) {
+      context.handle(
+        _quizIdMeta,
+        quizId.isAcceptableOrUnknown(data['quiz_id']!, _quizIdMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_quizIdMeta);
+    }
+    if (data.containsKey('column_index')) {
+      context.handle(
+        _columnIndexMeta,
+        columnIndex.isAcceptableOrUnknown(
+          data['column_index']!,
+          _columnIndexMeta,
+        ),
+      );
+    } else if (isInserting) {
+      context.missing(_columnIndexMeta);
+    }
+    if (data.containsKey('position')) {
+      context.handle(
+        _positionMeta,
+        position.isAcceptableOrUnknown(data['position']!, _positionMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_positionMeta);
+    }
+    if (data.containsKey('word')) {
+      context.handle(
+        _wordMeta,
+        word.isAcceptableOrUnknown(data['word']!, _wordMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_wordMeta);
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  LotteryWordRow map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return LotteryWordRow(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      quizId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}quiz_id'],
+      )!,
+      columnIndex: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}column_index'],
+      )!,
+      position: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}position'],
+      )!,
+      word: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}word'],
+      )!,
+    );
+  }
+
+  @override
+  $LotteryWordsTable createAlias(String alias) {
+    return $LotteryWordsTable(attachedDatabase, alias);
+  }
+}
+
+class LotteryWordRow extends DataClass implements Insertable<LotteryWordRow> {
+  final int id;
+  final int quizId;
+  final int columnIndex;
+  final int position;
+  final String word;
+  const LotteryWordRow({
+    required this.id,
+    required this.quizId,
+    required this.columnIndex,
+    required this.position,
+    required this.word,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['quiz_id'] = Variable<int>(quizId);
+    map['column_index'] = Variable<int>(columnIndex);
+    map['position'] = Variable<int>(position);
+    map['word'] = Variable<String>(word);
+    return map;
+  }
+
+  LotteryWordsCompanion toCompanion(bool nullToAbsent) {
+    return LotteryWordsCompanion(
+      id: Value(id),
+      quizId: Value(quizId),
+      columnIndex: Value(columnIndex),
+      position: Value(position),
+      word: Value(word),
+    );
+  }
+
+  factory LotteryWordRow.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return LotteryWordRow(
+      id: serializer.fromJson<int>(json['id']),
+      quizId: serializer.fromJson<int>(json['quizId']),
+      columnIndex: serializer.fromJson<int>(json['columnIndex']),
+      position: serializer.fromJson<int>(json['position']),
+      word: serializer.fromJson<String>(json['word']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'quizId': serializer.toJson<int>(quizId),
+      'columnIndex': serializer.toJson<int>(columnIndex),
+      'position': serializer.toJson<int>(position),
+      'word': serializer.toJson<String>(word),
+    };
+  }
+
+  LotteryWordRow copyWith({
+    int? id,
+    int? quizId,
+    int? columnIndex,
+    int? position,
+    String? word,
+  }) => LotteryWordRow(
+    id: id ?? this.id,
+    quizId: quizId ?? this.quizId,
+    columnIndex: columnIndex ?? this.columnIndex,
+    position: position ?? this.position,
+    word: word ?? this.word,
+  );
+  LotteryWordRow copyWithCompanion(LotteryWordsCompanion data) {
+    return LotteryWordRow(
+      id: data.id.present ? data.id.value : this.id,
+      quizId: data.quizId.present ? data.quizId.value : this.quizId,
+      columnIndex: data.columnIndex.present
+          ? data.columnIndex.value
+          : this.columnIndex,
+      position: data.position.present ? data.position.value : this.position,
+      word: data.word.present ? data.word.value : this.word,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LotteryWordRow(')
+          ..write('id: $id, ')
+          ..write('quizId: $quizId, ')
+          ..write('columnIndex: $columnIndex, ')
+          ..write('position: $position, ')
+          ..write('word: $word')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, quizId, columnIndex, position, word);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is LotteryWordRow &&
+          other.id == this.id &&
+          other.quizId == this.quizId &&
+          other.columnIndex == this.columnIndex &&
+          other.position == this.position &&
+          other.word == this.word);
+}
+
+class LotteryWordsCompanion extends UpdateCompanion<LotteryWordRow> {
+  final Value<int> id;
+  final Value<int> quizId;
+  final Value<int> columnIndex;
+  final Value<int> position;
+  final Value<String> word;
+  const LotteryWordsCompanion({
+    this.id = const Value.absent(),
+    this.quizId = const Value.absent(),
+    this.columnIndex = const Value.absent(),
+    this.position = const Value.absent(),
+    this.word = const Value.absent(),
+  });
+  LotteryWordsCompanion.insert({
+    this.id = const Value.absent(),
+    required int quizId,
+    required int columnIndex,
+    required int position,
+    required String word,
+  }) : quizId = Value(quizId),
+       columnIndex = Value(columnIndex),
+       position = Value(position),
+       word = Value(word);
+  static Insertable<LotteryWordRow> custom({
+    Expression<int>? id,
+    Expression<int>? quizId,
+    Expression<int>? columnIndex,
+    Expression<int>? position,
+    Expression<String>? word,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (quizId != null) 'quiz_id': quizId,
+      if (columnIndex != null) 'column_index': columnIndex,
+      if (position != null) 'position': position,
+      if (word != null) 'word': word,
+    });
+  }
+
+  LotteryWordsCompanion copyWith({
+    Value<int>? id,
+    Value<int>? quizId,
+    Value<int>? columnIndex,
+    Value<int>? position,
+    Value<String>? word,
+  }) {
+    return LotteryWordsCompanion(
+      id: id ?? this.id,
+      quizId: quizId ?? this.quizId,
+      columnIndex: columnIndex ?? this.columnIndex,
+      position: position ?? this.position,
+      word: word ?? this.word,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (quizId.present) {
+      map['quiz_id'] = Variable<int>(quizId.value);
+    }
+    if (columnIndex.present) {
+      map['column_index'] = Variable<int>(columnIndex.value);
+    }
+    if (position.present) {
+      map['position'] = Variable<int>(position.value);
+    }
+    if (word.present) {
+      map['word'] = Variable<String>(word.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('LotteryWordsCompanion(')
+          ..write('id: $id, ')
+          ..write('quizId: $quizId, ')
+          ..write('columnIndex: $columnIndex, ')
+          ..write('position: $position, ')
+          ..write('word: $word')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1180,6 +1785,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $StudentsTable students = $StudentsTable(this);
   late final $GroupsTable groups = $GroupsTable(this);
   late final $MembersTable members = $MembersTable(this);
+  late final $LotteryQuizzesTable lotteryQuizzes = $LotteryQuizzesTable(this);
+  late final $LotteryWordsTable lotteryWords = $LotteryWordsTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1189,6 +1796,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     students,
     groups,
     members,
+    lotteryQuizzes,
+    lotteryWords,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -1219,6 +1828,13 @@ abstract class _$AppDatabase extends GeneratedDatabase {
         limitUpdateKind: UpdateKind.delete,
       ),
       result: [TableUpdate('members', kind: UpdateKind.delete)],
+    ),
+    WritePropagation(
+      on: TableUpdateQuery.onTableName(
+        'lottery_quizzes',
+        limitUpdateKind: UpdateKind.delete,
+      ),
+      result: [TableUpdate('lottery_words', kind: UpdateKind.delete)],
     ),
   ]);
 }
@@ -2691,6 +3307,583 @@ typedef $$MembersTableProcessedTableManager =
       Member,
       PrefetchHooks Function({bool groupId, bool studentId})
     >;
+typedef $$LotteryQuizzesTableCreateCompanionBuilder =
+    LotteryQuizzesCompanion Function({
+      Value<int> id,
+      required String name,
+      required DateTime createdAt,
+    });
+typedef $$LotteryQuizzesTableUpdateCompanionBuilder =
+    LotteryQuizzesCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<DateTime> createdAt,
+    });
+
+final class $$LotteryQuizzesTableReferences
+    extends
+        BaseReferences<_$AppDatabase, $LotteryQuizzesTable, LotteryQuizRow> {
+  $$LotteryQuizzesTableReferences(
+    super.$_db,
+    super.$_table,
+    super.$_typedResult,
+  );
+
+  static MultiTypedResultKey<$LotteryWordsTable, List<LotteryWordRow>>
+  _lotteryWordsRefsTable(_$AppDatabase db) => MultiTypedResultKey.fromTable(
+    db.lotteryWords,
+    aliasName: 'lottery_quizzes__id__lottery_words__quiz_id',
+  );
+
+  $$LotteryWordsTableProcessedTableManager get lotteryWordsRefs {
+    final manager = $$LotteryWordsTableTableManager(
+      $_db,
+      $_db.lotteryWords,
+    ).filter((f) => f.quizId.id.sqlEquals($_itemColumn<int>('id')!));
+
+    final cache = $_typedResult.readTableOrNull(_lotteryWordsRefsTable($_db));
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: cache),
+    );
+  }
+}
+
+class $$LotteryQuizzesTableFilterComposer
+    extends Composer<_$AppDatabase, $LotteryQuizzesTable> {
+  $$LotteryQuizzesTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  Expression<bool> lotteryWordsRefs(
+    Expression<bool> Function($$LotteryWordsTableFilterComposer f) f,
+  ) {
+    final $$LotteryWordsTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.lotteryWords,
+      getReferencedColumn: (t) => t.quizId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LotteryWordsTableFilterComposer(
+            $db: $db,
+            $table: $db.lotteryWords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$LotteryQuizzesTableOrderingComposer
+    extends Composer<_$AppDatabase, $LotteryQuizzesTable> {
+  $$LotteryQuizzesTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$LotteryQuizzesTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LotteryQuizzesTable> {
+  $$LotteryQuizzesTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  Expression<T> lotteryWordsRefs<T extends Object>(
+    Expression<T> Function($$LotteryWordsTableAnnotationComposer a) f,
+  ) {
+    final $$LotteryWordsTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.id,
+      referencedTable: $db.lotteryWords,
+      getReferencedColumn: (t) => t.quizId,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LotteryWordsTableAnnotationComposer(
+            $db: $db,
+            $table: $db.lotteryWords,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return f(composer);
+  }
+}
+
+class $$LotteryQuizzesTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LotteryQuizzesTable,
+          LotteryQuizRow,
+          $$LotteryQuizzesTableFilterComposer,
+          $$LotteryQuizzesTableOrderingComposer,
+          $$LotteryQuizzesTableAnnotationComposer,
+          $$LotteryQuizzesTableCreateCompanionBuilder,
+          $$LotteryQuizzesTableUpdateCompanionBuilder,
+          (LotteryQuizRow, $$LotteryQuizzesTableReferences),
+          LotteryQuizRow,
+          PrefetchHooks Function({bool lotteryWordsRefs})
+        > {
+  $$LotteryQuizzesTableTableManager(
+    _$AppDatabase db,
+    $LotteryQuizzesTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LotteryQuizzesTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LotteryQuizzesTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LotteryQuizzesTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => LotteryQuizzesCompanion(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required DateTime createdAt,
+              }) => LotteryQuizzesCompanion.insert(
+                id: id,
+                name: name,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LotteryQuizzesTable, LotteryQuizRow>(table),
+                  $$LotteryQuizzesTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({lotteryWordsRefs = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [if (lotteryWordsRefs) db.lotteryWords],
+              addJoins: null,
+              getPrefetchedDataCallback: (items) async {
+                return [
+                  if (lotteryWordsRefs)
+                    await $_getPrefetchedDataByColumns<
+                      LotteryQuizRow,
+                      $LotteryQuizzesTable,
+                      LotteryWordRow,
+                      $LotteryWordsTable
+                    >(
+                      currentTable: table,
+                      referencedTable: $$LotteryQuizzesTableReferences
+                          ._lotteryWordsRefsTable(db),
+                      managerFromTypedResult: (p0) =>
+                          $$LotteryQuizzesTableReferences(
+                            db,
+                            table,
+                            p0,
+                          ).lotteryWordsRefs,
+                      currentColumn: 'id',
+                      referencedColumn: 'quiz_id',
+                      typedResults: items,
+                    ),
+                ];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LotteryQuizzesTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LotteryQuizzesTable,
+      LotteryQuizRow,
+      $$LotteryQuizzesTableFilterComposer,
+      $$LotteryQuizzesTableOrderingComposer,
+      $$LotteryQuizzesTableAnnotationComposer,
+      $$LotteryQuizzesTableCreateCompanionBuilder,
+      $$LotteryQuizzesTableUpdateCompanionBuilder,
+      (LotteryQuizRow, $$LotteryQuizzesTableReferences),
+      LotteryQuizRow,
+      PrefetchHooks Function({bool lotteryWordsRefs})
+    >;
+typedef $$LotteryWordsTableCreateCompanionBuilder =
+    LotteryWordsCompanion Function({
+      Value<int> id,
+      required int quizId,
+      required int columnIndex,
+      required int position,
+      required String word,
+    });
+typedef $$LotteryWordsTableUpdateCompanionBuilder =
+    LotteryWordsCompanion Function({
+      Value<int> id,
+      Value<int> quizId,
+      Value<int> columnIndex,
+      Value<int> position,
+      Value<String> word,
+    });
+
+final class $$LotteryWordsTableReferences
+    extends BaseReferences<_$AppDatabase, $LotteryWordsTable, LotteryWordRow> {
+  $$LotteryWordsTableReferences(super.$_db, super.$_table, super.$_typedResult);
+
+  static $LotteryQuizzesTable _quizIdTable(_$AppDatabase db) => db
+      .lotteryQuizzes
+      .createAlias('lottery_words__quiz_id__lottery_quizzes__id');
+
+  $$LotteryQuizzesTableProcessedTableManager get quizId {
+    final $_column = $_itemColumn<int>('quiz_id')!;
+
+    final manager = $$LotteryQuizzesTableTableManager(
+      $_db,
+      $_db.lotteryQuizzes,
+    ).filter((f) => f.id.sqlEquals($_column));
+    final item = $_typedResult.readTableOrNull(_quizIdTable($_db));
+    if (item == null) return manager;
+    return ProcessedTableManager(
+      manager.$state.copyWith(prefetchedData: [item]),
+    );
+  }
+}
+
+class $$LotteryWordsTableFilterComposer
+    extends Composer<_$AppDatabase, $LotteryWordsTable> {
+  $$LotteryWordsTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get columnIndex => $composableBuilder(
+    column: $table.columnIndex,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  $$LotteryQuizzesTableFilterComposer get quizId {
+    final $$LotteryQuizzesTableFilterComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.quizId,
+      referencedTable: $db.lotteryQuizzes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LotteryQuizzesTableFilterComposer(
+            $db: $db,
+            $table: $db.lotteryQuizzes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LotteryWordsTableOrderingComposer
+    extends Composer<_$AppDatabase, $LotteryWordsTable> {
+  $$LotteryWordsTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get columnIndex => $composableBuilder(
+    column: $table.columnIndex,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get position => $composableBuilder(
+    column: $table.position,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get word => $composableBuilder(
+    column: $table.word,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  $$LotteryQuizzesTableOrderingComposer get quizId {
+    final $$LotteryQuizzesTableOrderingComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.quizId,
+      referencedTable: $db.lotteryQuizzes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LotteryQuizzesTableOrderingComposer(
+            $db: $db,
+            $table: $db.lotteryQuizzes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LotteryWordsTableAnnotationComposer
+    extends Composer<_$AppDatabase, $LotteryWordsTable> {
+  $$LotteryWordsTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<int> get columnIndex => $composableBuilder(
+    column: $table.columnIndex,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get position =>
+      $composableBuilder(column: $table.position, builder: (column) => column);
+
+  GeneratedColumn<String> get word =>
+      $composableBuilder(column: $table.word, builder: (column) => column);
+
+  $$LotteryQuizzesTableAnnotationComposer get quizId {
+    final $$LotteryQuizzesTableAnnotationComposer composer = $composerBuilder(
+      composer: this,
+      getCurrentColumn: (t) => t.quizId,
+      referencedTable: $db.lotteryQuizzes,
+      getReferencedColumn: (t) => t.id,
+      builder:
+          (
+            joinBuilder, {
+            $addJoinBuilderToRootComposer,
+            $removeJoinBuilderFromRootComposer,
+          }) => $$LotteryQuizzesTableAnnotationComposer(
+            $db: $db,
+            $table: $db.lotteryQuizzes,
+            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
+            joinBuilder: joinBuilder,
+            $removeJoinBuilderFromRootComposer:
+                $removeJoinBuilderFromRootComposer,
+          ),
+    );
+    return composer;
+  }
+}
+
+class $$LotteryWordsTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $LotteryWordsTable,
+          LotteryWordRow,
+          $$LotteryWordsTableFilterComposer,
+          $$LotteryWordsTableOrderingComposer,
+          $$LotteryWordsTableAnnotationComposer,
+          $$LotteryWordsTableCreateCompanionBuilder,
+          $$LotteryWordsTableUpdateCompanionBuilder,
+          (LotteryWordRow, $$LotteryWordsTableReferences),
+          LotteryWordRow,
+          PrefetchHooks Function({bool quizId})
+        > {
+  $$LotteryWordsTableTableManager(_$AppDatabase db, $LotteryWordsTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$LotteryWordsTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$LotteryWordsTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$LotteryWordsTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<int> quizId = const Value.absent(),
+                Value<int> columnIndex = const Value.absent(),
+                Value<int> position = const Value.absent(),
+                Value<String> word = const Value.absent(),
+              }) => LotteryWordsCompanion(
+                id: id,
+                quizId: quizId,
+                columnIndex: columnIndex,
+                position: position,
+                word: word,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required int quizId,
+                required int columnIndex,
+                required int position,
+                required String word,
+              }) => LotteryWordsCompanion.insert(
+                id: id,
+                quizId: quizId,
+                columnIndex: columnIndex,
+                position: position,
+                word: word,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$LotteryWordsTable, LotteryWordRow>(table),
+                  $$LotteryWordsTableReferences(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: ({quizId = false}) {
+            return PrefetchHooks(
+              db: db,
+              explicitlyWatchedTables: [],
+              addJoins:
+                  <
+                    T extends TableManagerState<
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic,
+                      dynamic
+                    >
+                  >(state) {
+                    if (quizId) {
+                      state = state.withJoin(
+                        currentTable: table,
+                        currentColumn: table.quizId,
+                        referencedTable: $$LotteryWordsTableReferences
+                            ._quizIdTable(db),
+                        referencedColumn: $$LotteryWordsTableReferences
+                            ._quizIdTable(db)
+                            .id,
+                      ) as T;
+                    }
+
+                    return state;
+                  },
+              getPrefetchedDataCallback: (items) async {
+                return [];
+              },
+            );
+          },
+        ),
+      );
+}
+
+typedef $$LotteryWordsTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $LotteryWordsTable,
+      LotteryWordRow,
+      $$LotteryWordsTableFilterComposer,
+      $$LotteryWordsTableOrderingComposer,
+      $$LotteryWordsTableAnnotationComposer,
+      $$LotteryWordsTableCreateCompanionBuilder,
+      $$LotteryWordsTableUpdateCompanionBuilder,
+      (LotteryWordRow, $$LotteryWordsTableReferences),
+      LotteryWordRow,
+      PrefetchHooks Function({bool quizId})
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -2703,4 +3896,8 @@ class $AppDatabaseManager {
       $$GroupsTableTableManager(_db, _db.groups);
   $$MembersTableTableManager get members =>
       $$MembersTableTableManager(_db, _db.members);
+  $$LotteryQuizzesTableTableManager get lotteryQuizzes =>
+      $$LotteryQuizzesTableTableManager(_db, _db.lotteryQuizzes);
+  $$LotteryWordsTableTableManager get lotteryWords =>
+      $$LotteryWordsTableTableManager(_db, _db.lotteryWords);
 }

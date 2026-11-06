@@ -44,6 +44,8 @@ class ClassDetailScreen extends ConsumerWidget {
     );
     if (ok != true) return;
     await ref.read(repositoryProvider).deleteClass(c.id);
+    // go() doesn't complete the list's `await push`, so refresh it here.
+    ref.invalidate(classListProvider);
     if (context.mounted) context.go(TeamDiceRoutes.home);
   }
 

@@ -88,6 +88,8 @@ class _ClassFormScreenState extends ConsumerState<ClassFormScreen> {
           ),
       ];
       final id = await ref.read(repositoryProvider).createClass(_nameCtl.text.trim(), _students, drafts);
+      // The list's own `await push` never returns once this screen is replaced, so refresh it here.
+      ref.invalidate(classListProvider);
       if (mounted) context.pushReplacement(TeamDiceRoutes.draw(id));
     } finally {
       if (mounted) setState(() => _busy = false);

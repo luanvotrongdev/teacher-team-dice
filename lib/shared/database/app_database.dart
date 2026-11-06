@@ -3,6 +3,7 @@ import 'package:drift_flutter/drift_flutter.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../tools/team_dice/data/tables.dart';
+import '../../tools/word_lottery/data/tables.dart';
 
 part 'app_database.g.dart';
 
@@ -14,6 +15,8 @@ part 'app_database.g.dart';
 @DriftDatabase(tables: [
   // Team Dice
   Classes, Students, Groups, Members,
+  // Word Lottery
+  LotteryQuizzes, LotteryWords,
 ])
 class AppDatabase extends _$AppDatabase {
   AppDatabase([QueryExecutor? executor])
@@ -27,11 +30,18 @@ class AppDatabase extends _$AppDatabase {
               ),
             ));
 
+  // 1: Team Dice. 2: Word Lottery tables.
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
 
   @override
   MigrationStrategy get migration => MigrationStrategy(
+        onUpgrade: (m, from, to) async {
+          if (from < 2) {
+            await m.createTable(lotteryQuizzes);
+            await m.createTable(lotteryWords);
+          }
+        },
         beforeOpen: (details) async {
           await customStatement('PRAGMA foreign_keys = ON');
         },

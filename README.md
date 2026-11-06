@@ -16,7 +16,26 @@ Splitting a class into groups and handing out projects is a chore. Team Dice doe
 - Save results to a local database to reopen and check later
 - Export saved groups to Excel
 
-## Student Excel format
+### Word Lottery
+
+Give the class a random prompt to work with. Each column of an Excel sheet is a list of words (for example: who, does what, to what, where). Press **Lottery** and the app picks one word from every column.
+
+- Create a quiz: give it a name, then import an Excel file
+- Empty rows and columns are removed, and a confirmation screen shows what was read before anything is saved
+- **Lottery** button rolls the words for a moment, then shows one combination (never the same one twice in a row)
+- Delete a quiz from its screen
+
+## Word Lottery Excel format
+
+A single `.xlsx` file with **one sheet**. Each column is a list of words. Columns can have different lengths, and blank cells are skipped. There is no header row: every cell counts as a word. See `samples/word_lottery_sample.xlsx`.
+
+| A | B | C |
+|---|---|---|
+| I | want to buy | a new phone |
+| You | design | a coffee brand |
+| Our team | sell | |
+
+## Student Excel format (Team Dice)
 
 A single `.xlsx` file. Student names go in **column A** of the first sheet. A header row (for example `Name`) is optional and is skipped automatically.
 
@@ -47,7 +66,7 @@ flutter build ipa        # needs an Apple signing team set in Xcode
 ## On iPhone
 
 - The iPhone app is locked to portrait. iPad also allows landscape.
-- To import students, put the `.xlsx` file somewhere the Files app can see (iCloud Drive, On My iPhone, AirDrop, or "Save to Files" from Mail), then tap **Import students**.
+- To import a file (students or words), put the `.xlsx` file somewhere the Files app can see (iCloud Drive, On My iPhone, AirDrop, or "Save to Files" from Mail), then tap **Import**.
 - **Export Excel** opens the iOS "Save to Files" dialog.
 
 Run the tests:
