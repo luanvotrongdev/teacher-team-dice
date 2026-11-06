@@ -64,6 +64,16 @@ flutter build web
 flutter build ipa        # needs an Apple signing team set in Xcode
 ```
 
+For the App Store, use the release script. It runs the checks, then builds a signed `.ipa` whose build number is the current time (`yyyyMMddHHmm`, e.g. `202611061430`), so every upload gets a new number. The version name comes from `pubspec.yaml`.
+
+```bash
+scripts/build_ios_release.sh                 # analyze, test, build
+scripts/build_ios_release.sh --skip-checks   # build only
+scripts/build_ios_release.sh --name 1.1.0    # different version name
+```
+
+The `.ipa` lands in `build/ios/ipa/`. Upload it with Apple's Transporter app, or run with `--open` to upload from Xcode's Organizer.
+
 ## On iPhone
 
 - Works in portrait and landscape. Turn the phone sideways to see a Word Lottery combination in one line.

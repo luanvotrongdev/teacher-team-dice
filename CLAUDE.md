@@ -26,6 +26,7 @@ dart run flutter_launcher_icons   # regenerate iOS/Web/Windows icons from assets
 flutter build windows
 flutter build web
 flutter build ios --simulator --debug   # quick iOS compile check, no signing needed
+scripts/build_ios_release.sh   # App Store .ipa: analyze + test, then build with build number yyyyMMddHHmm (--skip-checks, --name X.Y.Z, --open)
 ```
 
 ## Architecture
