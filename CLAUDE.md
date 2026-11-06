@@ -4,7 +4,9 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-Team Dice: a Flutter app for iOS (primary target, iPhone in portrait), Windows and Web — no Android/macOS/Linux folders. It imports a student list from Excel, randomly splits it into evenly sized groups with an animated "draw", saves results locally, and exports them back to Excel. All data stays on-device.
+A multi-tool Flutter app for teachers. It targets iOS first (iPhone in portrait), plus Windows and Web; there are no Android/macOS/Linux folders. The app opens on a main menu, and the user picks a tool from it. More tools will be added. Today there is one tool, **Team Dice**: import a student list from Excel, split it into random even groups with an animated draw, save locally, and export to Excel. All data stays on-device.
+
+The in-app name is a placeholder (`appName` in `lib/app/app.dart`, currently "Teacher Tools"). Platform display names (iOS `Info.plist`, `web/index.html` + `manifest.json`, Windows `Runner.rc`) still say "Team Dice". The package name stays `teacher_team_dice`.
 
 ## Commands
 
@@ -13,9 +15,9 @@ flutter pub get
 flutter run -d windows        # or: flutter run -d chrome / -d ios
 flutter analyze               # lints: package:flutter_lints (platform folders and build/ excluded)
 flutter test                  # all tests
-flutter test test/core_test.dart                          # one file
-flutter test test/core_test.dart --plain-name 'assignEvenly'   # one test by name
-dart run build_runner build   # regenerate lib/data/database.g.dart after changing tables
+flutter test test/tools/team_dice/core_test.dart                          # one file
+flutter test test/tools/team_dice/core_test.dart --plain-name 'assignEvenly'   # one test by name
+dart run build_runner build   # regenerate lib/shared/database/app_database.g.dart after changing any tables
 flutter build windows
 flutter build web
 flutter build ios --simulator --debug   # quick iOS compile check, no signing needed
@@ -23,24 +25,60 @@ flutter build ios --simulator --debug   # quick iOS compile check, no signing ne
 
 ## Architecture
 
-Layers under `lib/`:
+```
+lib/
+  main.dart            ProviderScope + TeacherToolsApp
+  app/                 the shell: knows about every tool
+    tool.dart          ToolDefinition (id, name, description, icon, home, routes)
+    tools.dart         appTools: the registry, in menu order
+    router.dart        `/` = main menu; each tool mounted at `/<id>` as a child route
+    main_menu_screen.dart, app.dart
+  shared/              code used by more than one tool
+    database/          AppDatabase (the one drift DB) + databaseProvider
+  tools/<tool>/        everything a tool owns
+```
 
-- `models/models.dart` — plain immutable domain models (`ClassModel`, `GroupModel`, `Student`, `GroupDraft`). UI code works only with these, never with drift row classes.
-- `data/database.dart` — drift schema: `Classes` → `Students` and `Groups` (cascade delete) → `Members` (join table, PK `groupId+studentId`, ordered by `position`). `orderIndex` columns preserve import/creation order. Foreign keys are enabled via `PRAGMA` in `beforeOpen`. `database.g.dart` is generated — don't hand-edit it.
-- `data/class_repository.dart` — the only code that touches the DB; maps rows to models. Imports `database.dart` with `hide Student` because drift generates a `Student` row class that clashes with the domain model. `saveAssignment` replaces all memberships for a class in one transaction.
-- `data/providers.dart` — Riverpod providers (`databaseProvider`, `repositoryProvider`, `classListProvider`, `classProvider(id)`). Read providers are `autoDispose` futures with no reactive DB streams, so screens must `ref.invalidate(...)` them after writes or after returning from a pushed route.
-- `core/` — pure logic: `shuffle_service.dart` (`assignEvenly`: shuffle then round-robin, so sizes differ by ≤1; takes an optional `Random` for tests) and `excel_service.dart` (`parseStudents` reads column A of the first sheet and drops a header row if it matches a known header word, including Vietnamese ones; `buildExport` writes "Groups" and "Summary" sheets).
-- `features/` — screens, routed by go_router in `main.dart`: `/` home list, `/new` class form, `/draw/:id` animated draw, `/class/:id` saved result + export. Home opens `/class/:id` if a class already has a result (`ClassModel.hasResult`), otherwise `/draw/:id`.
+- **Tools are self-contained.** A tool folder holds its screens, logic, models, repository, providers and drift tables. It exposes one `ToolDefinition`, plus a `routes.dart` of absolute path helpers (e.g. `TeamDiceRoutes.draw(id)`) so its screens don't hardcode URLs. Tools must not import each other. Anything two tools need goes in `lib/shared/`.
+- **Routing.** Tool routes are nested under `/`, so `context.go('/team-dice/...')` always builds a stack with the main menu at the bottom, and the tool's start screen gets an automatic back button to the menu. A tool's sub-routes are relative to its id.
+- **One database.** `AppDatabase` (`lib/shared/database/app_database.dart`) lists every tool's tables. Tools get it through `databaseProvider` and wrap it in their own repository. Sharing data between tools is not designed yet. The single DB keeps that open: a later tool can read another tool's tables, or shared tables (e.g. a class roster) can be promoted into `lib/shared/`. The DB name stays `teacher_team_dice` so data saved before the multi-tool restructure still opens.
+- **Drift table class names are SQL table names.** Renaming `Classes`, `Students`, `Groups` or `Members` (or reusing those names in another tool) breaks existing data. Prefix a new tool's tables if names could clash. Drift generates row classes (e.g. `Student`) into the database library, which can clash with domain models. Team Dice imports the DB with `hide Student` for this reason.
+- **State.** Riverpod. Read providers are `autoDispose` futures with no reactive DB streams, so screens must `ref.invalidate(...)` them after writes or after returning from a pushed route.
 
-### Draw screen
+### Adding a tool
 
-`features/draw/draw_screen.dart` computes the final assignment up front, then animates toward it with timers through phases `loading` (~0.5s) → `scramble` (4 shuffles at 250ms) → `dealing` (batches at 33ms ticks, ~1.5s total) → `done`. Total is ~3s, and `test/draw_test.dart` relies on that timing (Save appears only after ~3.2s). Layout is manual: a `Stack` of `AnimatedPositioned` name cards keyed by student id, with positions computed from fixed constants (group boxes on top, unassigned pool below). Group boxes grow with the deepest filled slot rather than their final size, so on a phone the shuffling pool stays on screen until names are dealt. Below `_narrowWidth` (600) the pool cards stretch to fill 3 columns and the done-state actions (Re-roll / Save / View-Export) move from the app bar to a bottom bar. Skip jumps straight to `done`; Re-roll restarts with a new assignment. Nothing is persisted until the user presses Save.
+1. Create `lib/tools/<name>/` with a `<name>_tool.dart` exporting a `ToolDefinition` (URL-safe unique `id`), and a `routes.dart` for its paths.
+2. Add it to `appTools` in `lib/app/tools.dart`. It then appears in the main menu and router.
+3. If it stores data: define tables in `lib/tools/<name>/data/tables.dart`, add them to `@DriftDatabase(tables: [...])` in `app_database.dart`, bump `schemaVersion`, add an `onUpgrade` step that creates the new tables, then run `dart run build_runner build`.
+4. Put tests under `test/tools/<name>/`.
+
+### Team Dice (`lib/tools/team_dice/`)
+
+- `models/` holds plain immutable domain models (`ClassModel`, `GroupModel`, `Student`, `GroupDraft`). UI code uses these, never drift rows.
+- `data/` holds the tables (`Classes` → `Students`/`Groups` with cascade delete → `Members` join table ordered by `position`; `orderIndex` keeps import order), `ClassRepository` (the only DB access; `saveAssignment` replaces memberships in one transaction) and providers.
+- `core/` is pure logic:
+  - `assignEvenly` shuffles then deals round-robin, so group sizes differ by ≤1.
+  - `parseStudents` reads column A of the first sheet and drops a known header word (including Vietnamese ones).
+  - `buildExport` writes "Groups" and "Summary" sheets.
+- `features/` holds the screens: home (class list) → new class form → draw → saved result/export. Home opens the result if the class has one, otherwise the draw.
+
+The draw screen (`features/draw/draw_screen.dart`) computes the final assignment up front, then animates toward it on timers:
+- **Phases:** `loading` (~0.5s) → `scramble` (4 shuffles at 250ms) → `dealing` (33ms ticks, ~1.5s) → `done`. That's ~3s in total, and `test/tools/team_dice/draw_test.dart` depends on that timing.
+- **Layout:** manual. A `Stack` of `AnimatedPositioned` name cards keyed by student id, with group boxes on top and the pool below. Group boxes grow with the deepest filled slot, so on a phone the shuffling pool stays on screen.
+- **Narrow screens:** below `_narrowWidth` (600), pool cards fill 3 columns and the done-state actions move to a bottom bar.
+- **Saving:** nothing is persisted until Save.
 
 ## Platform notes
 
-- **iOS:** iPhone is portrait-only via `UISupportedInterfaceOrientations` in `ios/Runner/Info.plist`; iPad keeps all orientations (needed for multitasking). Minimum iOS 15 (file_picker needs 14+). Bundle ID `com.luanvo.teacherTeamDice`. Import uses the system document picker; export uses file_saver's `saveAs`, which opens "Save to Files" and returns `null` on cancel. Scrollable bodies add `MediaQuery.paddingOf(context).bottom` so content clears the home indicator.
-- **Web:** `AppDatabase` uses `drift_flutter`'s `driftDatabase` with `web/sqlite3.wasm` and `web/drift_worker.js`; both are committed and required for the web build. If you upgrade drift/sqlite3, these files may need to be replaced with matching versions.
+- **iOS:**
+  - iPhone is portrait-only via `UISupportedInterfaceOrientations` in `ios/Runner/Info.plist`. iPad keeps all orientations, because multitasking needs them.
+  - Minimum iOS 15 (file_picker needs 14+). Bundle ID `com.luanvo.teacherTeamDice`.
+  - Import uses the system document picker. Export uses file_saver's `saveAs` ("Save to Files"), which returns `null` on cancel.
+  - Scrollable bodies add `MediaQuery.paddingOf(context).bottom` so content clears the home indicator.
+- **Web:** the database needs `web/sqlite3.wasm` and `web/drift_worker.js` (both committed). They may need replacing when drift/sqlite3 is upgraded.
 
 ## Testing
 
-Tests build the DB with `AppDatabase(NativeDatabase.memory())` and override `repositoryProvider` in a `ProviderScope`. Widget tests that hit drift need `tester.runAsync` for real async DB work. `test/draw_test.dart` runs the draw at both desktop (1200×900) and phone (390×844) sizes. Keep the phone case passing when changing the draw layout. `samples/students_59.xlsx` is a sample import file for manual testing.
+- Tests use `AppDatabase(NativeDatabase.memory())` and override `databaseProvider` (whole app) or a tool's repository provider in a `ProviderScope`. Widget tests that hit drift need `tester.runAsync` for real async DB work.
+- `test/app/main_menu_test.dart` covers the menu and tool navigation. `TeacherToolsApp(tools: [...])` accepts fake tools.
+- The draw test runs at desktop (1200×900) and phone (390×844) sizes.
+- `samples/students_59.xlsx` is a sample import file.

@@ -2,11 +2,11 @@ import 'package:drift/native.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teacher_team_dice/data/class_repository.dart';
-import 'package:teacher_team_dice/data/database.dart';
-import 'package:teacher_team_dice/data/providers.dart';
-import 'package:teacher_team_dice/features/draw/draw_screen.dart';
-import 'package:teacher_team_dice/models/models.dart';
+import 'package:teacher_team_dice/tools/team_dice/data/class_repository.dart';
+import 'package:teacher_team_dice/shared/database/app_database.dart';
+import 'package:teacher_team_dice/tools/team_dice/data/providers.dart';
+import 'package:teacher_team_dice/tools/team_dice/features/draw/draw_screen.dart';
+import 'package:teacher_team_dice/tools/team_dice/models/models.dart';
 
 /// Runs the full draw at [size], presses Save, and returns the saved group sizes.
 Future<List<int>> _drawAndSave(WidgetTester tester, Size size, {required int students, required int groups}) async {

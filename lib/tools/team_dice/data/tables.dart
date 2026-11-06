@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
-import 'package:drift_flutter/drift_flutter.dart';
 
-part 'database.g.dart';
+// Team Dice tables. They are registered in the shared AppDatabase.
+// Class names map to SQL table names, so renaming one would orphan saved data.
 
 class Classes extends Table {
   IntColumn get id => integer().autoIncrement()();
@@ -31,27 +31,4 @@ class Members extends Table {
 
   @override
   Set<Column> get primaryKey => {groupId, studentId};
-}
-
-@DriftDatabase(tables: [Classes, Students, Groups, Members])
-class AppDatabase extends _$AppDatabase {
-  AppDatabase([QueryExecutor? executor])
-      : super(executor ??
-            driftDatabase(
-              name: 'teacher_team_dice',
-              web: DriftWebOptions(
-                sqlite3Wasm: Uri.parse('sqlite3.wasm'),
-                driftWorker: Uri.parse('drift_worker.js'),
-              ),
-            ));
-
-  @override
-  int get schemaVersion => 1;
-
-  @override
-  MigrationStrategy get migration => MigrationStrategy(
-        beforeOpen: (details) async {
-          await customStatement('PRAGMA foreign_keys = ON');
-        },
-      );
 }

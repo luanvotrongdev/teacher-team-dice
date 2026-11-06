@@ -2,16 +2,19 @@
 
 A fun little project I built for my wife, who is a university teacher.
 
-Splitting a class into groups and handing out projects is a chore. Team Dice does it with a bit of fun: load the student list, press **Random**, and watch the names get shuffled and dealt into groups.
+It is growing into a small toolbox for teachers. The app opens on a main menu where you pick a tool. It runs on **iPhone / iPad** (designed for portrait), **Windows** and **Web**.
 
-## Features
+## Tools
+
+### Team Dice
+
+Splitting a class into groups and handing out projects is a chore. Team Dice does it with a bit of fun: load the student list, press **Random**, and watch the names get shuffled and dealt into groups.
 
 - Create a class: name, student list from an Excel file, number of groups, group names and project names
 - **Random** button with a ~3 second animation: names load, scramble, then fly one by one into their groups
 - Groups are split evenly (sizes differ by at most one)
 - Save results to a local database to reopen and check later
 - Export saved groups to Excel
-- Runs on **iPhone / iPad** (designed for portrait), **Windows** and **Web**
 
 ## Student Excel format
 
@@ -61,7 +64,8 @@ Data is stored only on the device (or in the browser), nothing is sent anywhere.
 
 ## Notes
 
-- If you change the database tables, regenerate code with `dart run build_runner build`.
+- Each tool lives in `lib/tools/<name>/` and is listed in `lib/app/tools.dart`. See "Adding a tool" in `CLAUDE.md`.
+- All tools share one local database (`lib/shared/database/app_database.dart`). If you change any tables, regenerate code with `dart run build_runner build`.
 - The web build needs `web/sqlite3.wasm` and `web/drift_worker.js`, which are included in the repo.
 
 Made with ❤️ for my wife.

@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 
 import '../models/models.dart';
-import 'database.dart' hide Student;
+import '../../../shared/database/app_database.dart' hide Student;
 
 class ClassRepository {
   ClassRepository(this.db);

@@ -1,14 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../shared/database/app_database.dart';
 import '../models/models.dart';
 import 'class_repository.dart';
-import 'database.dart';
-
-final databaseProvider = Provider<AppDatabase>((ref) {
-  final db = AppDatabase();
-  ref.onDispose(db.close);
-  return db;
-});
 
 final repositoryProvider = Provider<ClassRepository>((ref) => ClassRepository(ref.watch(databaseProvider)));
 

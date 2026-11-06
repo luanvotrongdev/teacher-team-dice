@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/excel_service.dart';
 import '../../data/providers.dart';
 import '../../models/models.dart';
+import '../../routes.dart';
 
 class ClassDetailScreen extends ConsumerWidget {
   const ClassDetailScreen({super.key, required this.classId});
@@ -43,7 +44,7 @@ class ClassDetailScreen extends ConsumerWidget {
     );
     if (ok != true) return;
     await ref.read(repositoryProvider).deleteClass(c.id);
-    if (context.mounted) context.go('/');
+    if (context.mounted) context.go(TeamDiceRoutes.home);
   }
 
   @override
@@ -56,14 +57,14 @@ class ClassDetailScreen extends ConsumerWidget {
         if (c == null) return Scaffold(appBar: AppBar(), body: const Center(child: Text('Class not found')));
         return Scaffold(
           appBar: AppBar(
-            leading: BackButton(onPressed: () => context.go('/')),
+            leading: BackButton(onPressed: () => context.go(TeamDiceRoutes.home)),
             title: Text(c.name),
             actions: [
               IconButton(
                 tooltip: 'Re-roll',
                 icon: const Icon(Icons.casino),
                 onPressed: () async {
-                  await context.push('/draw/${c.id}');
+                  await context.push(TeamDiceRoutes.draw(c.id));
                   ref.invalidate(classProvider(classId));
                 },
               ),

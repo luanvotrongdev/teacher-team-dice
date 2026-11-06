@@ -6,6 +6,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/excel_service.dart';
 import '../../data/providers.dart';
 import '../../models/models.dart';
+import '../../routes.dart';
 
 class ClassFormScreen extends ConsumerStatefulWidget {
   const ClassFormScreen({super.key});
@@ -87,7 +88,7 @@ class _ClassFormScreenState extends ConsumerState<ClassFormScreen> {
           ),
       ];
       final id = await ref.read(repositoryProvider).createClass(_nameCtl.text.trim(), _students, drafts);
-      if (mounted) context.pushReplacement('/draw/$id');
+      if (mounted) context.pushReplacement(TeamDiceRoutes.draw(id));
     } finally {
       if (mounted) setState(() => _busy = false);
     }

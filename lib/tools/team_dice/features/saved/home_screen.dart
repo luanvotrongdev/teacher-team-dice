@@ -3,9 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../data/providers.dart';
+import '../../routes.dart';
 
-class HomeScreen extends ConsumerWidget {
-  const HomeScreen({super.key});
+class TeamDiceHomeScreen extends ConsumerWidget {
+  const TeamDiceHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -14,7 +15,7 @@ class HomeScreen extends ConsumerWidget {
       appBar: AppBar(title: const Text('Team Dice')),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () async {
-          await context.push('/new');
+          await context.push(TeamDiceRoutes.newClass);
           ref.invalidate(classListProvider);
         },
         icon: const Icon(Icons.add),
@@ -42,7 +43,7 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () async {
-                    await context.push(c.hasResult ? '/class/${c.id}' : '/draw/${c.id}');
+                    await context.push(c.hasResult ? TeamDiceRoutes.result(c.id) : TeamDiceRoutes.draw(c.id));
                     ref.invalidate(classListProvider);
                   },
                 ),

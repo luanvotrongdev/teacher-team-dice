@@ -8,6 +8,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/shuffle_service.dart';
 import '../../data/providers.dart';
 import '../../models/models.dart';
+import '../../routes.dart';
 
 class DrawScreen extends ConsumerWidget {
   const DrawScreen({super.key, required this.classId});
@@ -147,7 +148,7 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
     }
   }
 
-  void _openResult() => context.pushReplacement('/class/${cls.id}');
+  void _openResult() => context.pushReplacement(TeamDiceRoutes.result(cls.id));
 
   @override
   Widget build(BuildContext context) {

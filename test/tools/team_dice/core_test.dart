@@ -1,11 +1,11 @@
 import 'package:drift/native.dart';
 import 'package:excel/excel.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:teacher_team_dice/core/excel_service.dart';
-import 'package:teacher_team_dice/core/shuffle_service.dart';
-import 'package:teacher_team_dice/data/class_repository.dart';
-import 'package:teacher_team_dice/data/database.dart';
-import 'package:teacher_team_dice/models/models.dart';
+import 'package:teacher_team_dice/tools/team_dice/core/excel_service.dart';
+import 'package:teacher_team_dice/tools/team_dice/core/shuffle_service.dart';
+import 'package:teacher_team_dice/tools/team_dice/data/class_repository.dart';
+import 'package:teacher_team_dice/shared/database/app_database.dart';
+import 'package:teacher_team_dice/tools/team_dice/models/models.dart';
 
 import 'dart:typed_data';
 
