@@ -35,6 +35,12 @@ class _TeacherToolsAppState extends State<TeacherToolsApp> {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(colorSchemeSeed: Colors.indigo, useMaterial3: true),
       routerConfig: _router,
+      // In landscape on a phone, keep every screen clear of the notch and rounded corners.
+      // App bars and bottom bars already pad the top and bottom themselves.
+      builder: (context, child) => ColoredBox(
+        color: Theme.of(context).colorScheme.surface,
+        child: SafeArea(top: false, bottom: false, child: child!),
+      ),
     );
   }
 }

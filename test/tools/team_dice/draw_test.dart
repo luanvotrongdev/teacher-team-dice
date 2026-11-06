@@ -52,4 +52,10 @@ void main() {
     expect(sizes, [9, 10, 10, 10, 10, 10]);
     expect(find.text('View / Export'), findsOneWidget);
   });
+
+  testWidgets('draw works on a landscape phone with actions in the app bar', (tester) async {
+    final sizes = await _drawAndSave(tester, const Size(874, 402), students: 59, groups: 6);
+    expect(sizes, [9, 10, 10, 10, 10, 10]);
+    expect(find.descendant(of: find.byType(AppBar), matching: find.text('View / Export')), findsOneWidget);
+  });
 }

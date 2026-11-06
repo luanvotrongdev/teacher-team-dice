@@ -112,6 +112,8 @@ class _LotteryBoardState extends State<LotteryBoard> {
     final theme = Theme.of(context);
     final words = _words;
     final settled = !_rolling && words != null;
+    // Landscape: the words sit side by side in one row. Portrait: they stack top to bottom.
+    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     final cards = [
       for (var i = 0; i < widget.columns.length; i++)
         _WordCard(
@@ -120,6 +122,7 @@ class _LotteryBoardState extends State<LotteryBoard> {
           // While rolling every tick swaps the word; once settled the key changes once more.
           switchKey: '${_rolling ? _ticks : 'done'}-$i-${words?[i]}',
           highlight: settled,
+          fillHeight: landscape,
         ),
     ];
 
@@ -127,7 +130,7 @@ class _LotteryBoardState extends State<LotteryBoard> {
       children: [
         Expanded(
           child: LayoutBuilder(builder: (context, box) {
-            final narrow = box.maxWidth < 600;
+            final width = box.maxWidth - 32;
             return SingleChildScrollView(
               padding: const EdgeInsets.all(16),
               child: ConstrainedBox(
@@ -140,14 +143,7 @@ class _LotteryBoardState extends State<LotteryBoard> {
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Text('Press Lottery to draw a combination', style: theme.textTheme.bodyLarge),
                       ),
-                    Wrap(
-                      alignment: WrapAlignment.center,
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        for (final c in cards) SizedBox(width: narrow ? box.maxWidth - 32 : 260, child: c),
-                      ],
-                    ),
+                    if (landscape) _row(cards, width) else _column(cards),
                   ],
                 ),
               ),
@@ -174,19 +170,81 @@ class _LotteryBoardState extends State<LotteryBoard> {
       ],
     );
   }
+
+  static const _gap = 12.0;
+
+  /// All cards in one row, sharing the width and the same height. If there are too many
+  /// columns to fit, the row scrolls sideways instead of squeezing the words.
+  Widget _row(List<Widget> cards, double width) {
+    final n = cards.length;
+    final cardW = ((width - _gap * (n - 1)) / n).clamp(140.0, 320.0);
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: IntrinsicHeight(
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            for (var i = 0; i < n; i++) ...[
+              if (i > 0) const SizedBox(width: _gap),
+              SizedBox(width: cardW, child: cards[i]),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
+  /// All cards stacked, full width (capped on tablets so the cards don't get too wide).
+  Widget _column(List<Widget> cards) {
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 480),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < cards.length; i++) ...[
+            if (i > 0) const SizedBox(height: _gap),
+            cards[i],
+          ],
+        ],
+      ),
+    );
+  }
 }
 
 class _WordCard extends StatelessWidget {
-  const _WordCard({required this.label, required this.word, required this.switchKey, required this.highlight});
+  const _WordCard({
+    required this.label,
+    required this.word,
+    required this.switchKey,
+    required this.highlight,
+    required this.fillHeight,
+  });
   final String label;
   final String word;
   final String switchKey;
   final bool highlight;
 
+  /// In a row the card is stretched to its tallest neighbour: keep the label at the top
+  /// and center the word in the space below.
+  final bool fillHeight;
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final scheme = theme.colorScheme;
+    final wordView = AnimatedSwitcher(
+      duration: const Duration(milliseconds: 150),
+      transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
+      child: Text(
+        word,
+        key: ValueKey(switchKey),
+        textAlign: TextAlign.center,
+        style: theme.textTheme.headlineSmall?.copyWith(
+          fontWeight: FontWeight.w600,
+          color: highlight ? scheme.onPrimaryContainer : null,
+        ),
+      ),
+    );
     return Card(
       color: highlight ? scheme.primaryContainer : null,
       child: Padding(
@@ -195,19 +253,7 @@ class _WordCard extends StatelessWidget {
           children: [
             Text(label, style: theme.textTheme.labelMedium?.copyWith(color: scheme.onSurfaceVariant)),
             const SizedBox(height: 6),
-            AnimatedSwitcher(
-              duration: const Duration(milliseconds: 150),
-              transitionBuilder: (child, anim) => ScaleTransition(scale: anim, child: child),
-              child: Text(
-                word,
-                key: ValueKey(switchKey),
-                textAlign: TextAlign.center,
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w600,
-                  color: highlight ? scheme.onPrimaryContainer : null,
-                ),
-              ),
-            ),
+            if (fillHeight) Expanded(child: Center(child: wordView)) else wordView,
           ],
         ),
       ),

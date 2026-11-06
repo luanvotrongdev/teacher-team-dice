@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-A multi-tool Flutter app for teachers. It targets iOS first (iPhone in portrait), plus Windows and Web; there are no Android/macOS/Linux folders. The app opens on a main menu, and the user picks a tool from it. More tools will be added. Today there are two:
+A multi-tool Flutter app for teachers. It targets iOS first (iPhone, portrait and landscape), plus Windows and Web; there are no Android/macOS/Linux folders. The app opens on a main menu, and the user picks a tool from it. More tools will be added. Today there are two:
 - **Team Dice**: import a student list from Excel, split it into random even groups with an animated draw, save locally, and export to Excel.
 - **Word Lottery**: import an Excel sheet where each column is a list of words, save it as a named quiz, and press Lottery to draw one random word from every column.
 
@@ -86,12 +86,15 @@ The draw screen (`features/draw/draw_screen.dart`) computes the final assignment
   - `features/saved/home_screen.dart`: the quiz list.
   - `features/quiz_form/quiz_form_screen.dart`: name → import → confirmation, all one screen. A `PopScope` sends Back from the confirmation step to the form, and nothing is saved until Confirm.
   - `features/play/play_screen.dart`: the Lottery button rolls the words for `LotteryBoard.rollDuration` (800ms), then settles. Delete is in the app bar.
+  - The board follows `MediaQuery.orientationOf`: landscape puts the word cards side by side in one row (equal heights, label on top, scrolls sideways if there are too many columns); portrait stacks them in one column. `test/tools/word_lottery/board_test.dart` checks both.
 - **File picking** goes through `quizFilePickerProvider`, so tests can supply bytes without the platform picker.
 
 ## Platform notes
 
 - **iOS:**
-  - iPhone is portrait-only via `UISupportedInterfaceOrientations` in `ios/Runner/Info.plist`. iPad keeps all orientations, because multitasking needs them.
+  - iPhone allows portrait and landscape (left/right, not upside down) via `UISupportedInterfaceOrientations` in `ios/Runner/Info.plist`. iPad allows all four.
+  - Layouts key off width, not orientation (Team Dice switches to its wide layout at 600pt, so a landscape iPhone gets the desktop-style draw with actions in the app bar). Word Lottery's board is the one place that checks orientation.
+  - `TeacherToolsApp`'s `builder` wraps every screen in a left/right `SafeArea`, so landscape content clears the notch / Dynamic Island. App bars and bottom bars pad the top and bottom themselves.
   - Minimum iOS 15 (file_picker needs 14+). Bundle ID `com.luanvo.teacherTeamDice`.
   - Import uses the system document picker. Export uses file_saver's `saveAs` ("Save to Files"), which returns `null` on cancel.
   - Scrollable bodies add `MediaQuery.paddingOf(context).bottom` so content clears the home indicator.
@@ -102,5 +105,5 @@ The draw screen (`features/draw/draw_screen.dart`) computes the final assignment
 - Tests use `AppDatabase(NativeDatabase.memory())` and override `databaseProvider` (whole app) or a tool's repository provider in a `ProviderScope`. Widget tests that hit drift need `tester.runAsync` for real async DB work.
 - `test/app/main_menu_test.dart` covers the menu and tool navigation. `TeacherToolsApp(tools: [...])` accepts fake tools.
 - Full-app flows: `test/tools/word_lottery/flow_test.dart` (create → confirm → draw → back → delete) and `test/tools/team_dice/home_test.dart` (delete refreshes the list). Both build .xlsx bytes in memory with the `excel` package.
-- The draw test runs at desktop (1200×900) and phone (390×844) sizes.
+- The draw test runs at desktop (1200×900), portrait phone (390×844) and landscape phone (874×402) sizes.
 - Sample import files: `samples/students_59.xlsx` (Team Dice) and `samples/word_lottery_sample.xlsx` (Word Lottery, 4 columns).

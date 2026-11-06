@@ -63,6 +63,25 @@ void main() {
     expect(find.text('Choose a tool'), findsOneWidget);
   });
 
+  testWidgets('landscape content stays clear of the side notch', (tester) async {
+    tester.view.physicalSize = const Size(874, 402);
+    tester.view.devicePixelRatio = 1;
+    tester.view.padding = const FakeViewPadding(left: 62, right: 62, bottom: 21);
+    addTearDown(tester.view.reset);
+    final db = AppDatabase(NativeDatabase.memory());
+    addTearDown(db.close);
+    await tester.pumpWidget(ProviderScope(
+      overrides: [databaseProvider.overrideWithValue(db)],
+      child: const TeacherToolsApp(),
+    ));
+    await tester.pumpAndSettle();
+    for (final tool in appTools) {
+      final rect = tester.getRect(find.text(tool.name));
+      expect(rect.left, greaterThanOrEqualTo(62));
+      expect(rect.right, lessThanOrEqualTo(874 - 62));
+    }
+  });
+
   testWidgets('Team Dice opens from the menu', (tester) async {
     await pumpApp(tester);
     await tester.tap(find.text('Team Dice'));

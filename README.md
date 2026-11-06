@@ -2,7 +2,7 @@
 
 A fun little project I built for my wife, who is a university teacher.
 
-It is growing into a small toolbox for teachers. The app opens on a main menu where you pick a tool. It runs on **iPhone / iPad** (designed for portrait), **Windows** and **Web**.
+It is growing into a small toolbox for teachers. The app opens on a main menu where you pick a tool. It runs on **iPhone / iPad** (portrait and landscape), **Windows** and **Web**.
 
 ## Tools
 
@@ -23,6 +23,7 @@ Give the class a random prompt to work with. Each column of an Excel sheet is a 
 - Create a quiz: give it a name, then import an Excel file
 - Empty rows and columns are removed, and a confirmation screen shows what was read before anything is saved
 - **Lottery** button rolls the words for a moment, then shows one combination (never the same one twice in a row)
+- The words are shown side by side in landscape, and stacked top to bottom in portrait
 - Delete a quiz from its screen
 
 ## Word Lottery Excel format
@@ -65,7 +66,7 @@ flutter build ipa        # needs an Apple signing team set in Xcode
 
 ## On iPhone
 
-- The iPhone app is locked to portrait. iPad also allows landscape.
+- Works in portrait and landscape. Turn the phone sideways to see a Word Lottery combination in one line.
 - To import a file (students or words), put the `.xlsx` file somewhere the Files app can see (iCloud Drive, On My iPhone, AirDrop, or "Save to Files" from Mail), then tap **Import**.
 - **Export Excel** opens the iOS "Save to Files" dialog.
 
