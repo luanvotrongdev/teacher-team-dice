@@ -103,7 +103,9 @@ class _ClassFormScreenState extends ConsumerState<ClassFormScreen> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 700),
             child: ListView(
-              padding: const EdgeInsets.all(16),
+              // Clear the iPhone home indicator; the number keyboard has no Done key, so swipe dismisses it.
+              padding: const EdgeInsets.all(16) + EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
+              keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
               children: [
                 TextFormField(
                   controller: _nameCtl,

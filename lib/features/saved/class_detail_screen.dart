@@ -1,4 +1,5 @@
 import 'package:file_saver/file_saver.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -14,12 +15,14 @@ class ClassDetailScreen extends ConsumerWidget {
   Future<void> _export(BuildContext context, ClassModel c) async {
     final messenger = ScaffoldMessenger.of(context);
     try {
-      await FileSaver.instance.saveAs(
+      final path = await FileSaver.instance.saveAs(
         name: '${c.name}_groups',
         bytes: buildExport(c),
         fileExtension: 'xlsx',
         mimeType: MimeType.microsoftExcel,
       );
+      // Native save dialogs (iOS "Save to Files", Windows) return null when cancelled.
+      if (path == null && !kIsWeb) return;
       messenger.showSnackBar(const SnackBar(content: Text('Exported to Excel')));
     } catch (e) {
       messenger.showSnackBar(SnackBar(content: Text('Export failed: $e')));
@@ -90,7 +93,7 @@ class GroupsGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GridView.builder(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(16) + EdgeInsets.only(bottom: MediaQuery.paddingOf(context).bottom),
       gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
         maxCrossAxisExtent: 320,
         mainAxisExtent: 360,

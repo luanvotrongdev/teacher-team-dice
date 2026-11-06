@@ -11,7 +11,7 @@ Splitting a class into groups and handing out projects is a chore. Team Dice doe
 - Groups are split evenly (sizes differ by at most one)
 - Save results to a local database to reopen and check later
 - Export saved groups to Excel
-- Runs on **Windows** and **Web**
+- Runs on **iPhone / iPad** (designed for portrait), **Windows** and **Web**
 
 ## Student Excel format
 
@@ -30,6 +30,7 @@ Requires [Flutter](https://flutter.dev) (stable).
 ```bash
 flutter pub get
 flutter run -d windows   # or: flutter run -d chrome
+flutter run -d ios       # iPhone simulator or device (macOS + Xcode only)
 ```
 
 Build a release:
@@ -37,7 +38,14 @@ Build a release:
 ```bash
 flutter build windows
 flutter build web
+flutter build ipa        # needs an Apple signing team set in Xcode
 ```
+
+## On iPhone
+
+- The iPhone app is locked to portrait. iPad also allows landscape.
+- To import students, put the `.xlsx` file somewhere the Files app can see (iCloud Drive, On My iPhone, AirDrop, or "Save to Files" from Mail), then tap **Import students**.
+- **Export Excel** opens the iOS "Save to Files" dialog.
 
 Run the tests:
 
@@ -47,7 +55,7 @@ flutter test
 
 ## Tech
 
-Flutter, Riverpod, go_router, drift (SQLite locally on Windows, in the browser on Web), `excel`, `file_picker`, `file_saver`.
+Flutter, Riverpod, go_router, drift (SQLite on iOS and Windows, in the browser on Web), `excel`, `file_picker`, `file_saver`.
 
 Data is stored only on the device (or in the browser), nothing is sent anywhere.
 

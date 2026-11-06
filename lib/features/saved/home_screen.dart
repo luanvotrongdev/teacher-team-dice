@@ -28,7 +28,8 @@ class HomeScreen extends ConsumerWidget {
             return const Center(child: Text('No classes yet. Create one to get started.'));
           }
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            // Extra bottom room so the last card isn't hidden behind the FAB / home indicator.
+            padding: EdgeInsets.fromLTRB(16, 16, 16, 88 + MediaQuery.paddingOf(context).bottom),
             itemCount: list.length,
             itemBuilder: (_, i) {
               final c = list[i];

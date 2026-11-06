@@ -33,6 +33,7 @@ const _cardGap = 4.0;
 const _poolCardW = 130.0;
 const _headerH = 64.0;
 const _gap = 12.0;
+const _narrowWidth = 600.0;
 
 class _DrawBody extends ConsumerStatefulWidget {
   const _DrawBody({required this.cls});
@@ -146,15 +147,19 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
     }
   }
 
+  void _openResult() => context.pushReplacement('/class/${cls.id}');
+
   @override
   Widget build(BuildContext context) {
     final done = _phase == _Phase.done;
+    // Phones in portrait: the result actions don't fit in the app bar, so they go in a bottom bar.
+    final narrow = MediaQuery.sizeOf(context).width < _narrowWidth;
     return Scaffold(
       appBar: AppBar(
         title: Text(cls.name),
         actions: [
           if (!done) TextButton(onPressed: _skip, child: const Text('Skip')),
-          if (done) ...[
+          if (done && !narrow) ...[
             TextButton.icon(onPressed: _start, icon: const Icon(Icons.casino), label: const Text('Re-roll')),
             const SizedBox(width: 8),
             FilledButton.icon(
@@ -162,38 +167,55 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
               icon: Icon(_saved ? Icons.check : Icons.save),
               label: Text(_saved ? 'Saved' : 'Save'),
             ),
-            if (_saved)
-              TextButton(onPressed: () => context.pushReplacement('/class/${cls.id}'), child: const Text('View / Export')),
+            if (_saved) TextButton(onPressed: _openResult, child: const Text('View / Export')),
             const SizedBox(width: 12),
           ],
         ],
       ),
-      body: LayoutBuilder(builder: (context, box) => _buildStage(context, box.maxWidth, box.maxHeight)),
+      bottomNavigationBar: done && narrow ? _bottomActions() : null,
+      body: LayoutBuilder(
+        builder: (context, box) => _buildStage(context, box.maxWidth, box.maxHeight, narrow),
+      ),
     );
   }
 
-  Widget _buildStage(BuildContext context, double w, double viewH) {
+  Widget _bottomActions() {
+    return Material(
+      elevation: 3,
+      child: SafeArea(
+        top: false,
+        child: Padding(
+          padding: const EdgeInsets.fromLTRB(12, 8, 12, 8),
+          child: Row(
+            children: [
+              Expanded(
+                child: OutlinedButton.icon(onPressed: _start, icon: const Icon(Icons.casino), label: const Text('Re-roll')),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _saved
+                    ? FilledButton.icon(
+                        onPressed: _openResult,
+                        icon: const Icon(Icons.table_view),
+                        label: const Text('View / Export'),
+                      )
+                    : FilledButton.icon(
+                        onPressed: _saving ? null : _save,
+                        icon: const Icon(Icons.save),
+                        label: const Text('Save'),
+                      ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStage(BuildContext context, double w, double viewH, bool narrow) {
     final scheme = Theme.of(context).colorScheme;
     final g = cls.groups.length;
     final n = cls.students.length;
-
-    // Pool grid.
-    final poolCols = max(1, ((w - _gap) / (_poolCardW + _gap)).floor());
-    final poolRows = (n / poolCols).ceil();
-    final poolH = poolRows * (_cardH + _gap) + _gap;
-    late final double poolTop;
-    Offset poolPos(int i) => Offset(_gap + (i % poolCols) * (_poolCardW + _gap), poolTop + (i ~/ poolCols) * (_cardH + _gap));
-
-    // Group boxes.
-    const minColW = 170.0;
-    final cols = min(g, max(1, ((w - _gap) / (minColW + _gap)).floor()));
-    final colW = (w - _gap * (cols + 1)) / cols;
-    final maxMembers = _assignment.fold<int>(0, (m, l) => max(m, l.length));
-    final boxH = _headerH + maxMembers * (_cardH + _cardGap) + 8;
-        Offset boxPos(int gi) => Offset(_gap + (gi % cols) * (colW + _gap), _gap + (gi ~/ cols) * (boxH + _gap));
-    final groupRows = (g / cols).ceil();
-    poolTop = groupRows * (boxH + _gap) + _gap + 8;
-    final totalH = max(viewH, poolTop + poolH);
 
     // Target slot per student.
     final slot = <int, (int, int)>{};
@@ -204,9 +226,35 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
     }
     final poolIndex = {for (var i = 0; i < _students.length; i++) _students[i].id: i};
 
+    // Pool grid. On narrow screens the cards stretch to fill the columns.
+    final poolMinW = narrow ? 104.0 : _poolCardW;
+    final poolCols = max(1, ((w - _gap) / (poolMinW + _gap)).floor());
+    final poolCardW = narrow ? (w - _gap * (poolCols + 1)) / poolCols : _poolCardW;
+    final poolRows = (n / poolCols).ceil();
+    final poolH = poolRows * (_cardH + _gap) + _gap;
+    late final double poolTop;
+    Offset poolPos(int i) => Offset(_gap + (i % poolCols) * (poolCardW + _gap), poolTop + (i ~/ poolCols) * (_cardH + _gap));
+
+    // Group boxes grow as names land, so the pool stays near the top (visible on a phone)
+    // until the dealing starts.
+    const minColW = 170.0;
+    final cols = min(g, max(1, ((w - _gap) / (minColW + _gap)).floor()));
+    final colW = (w - _gap * (cols + 1)) / cols;
+    final filledRows = _dealt.fold<int>(0, (m, id) => max(m, slot[id]!.$2 + 1));
+    final boxH = _headerH + filledRows * (_cardH + _cardGap) + 8;
+    Offset boxPos(int gi) => Offset(_gap + (gi % cols) * (colW + _gap), _gap + (gi ~/ cols) * (boxH + _gap));
+    final groupRows = (g / cols).ceil();
+    poolTop = groupRows * (boxH + _gap) + _gap + 8;
+    // Leave room for the home indicator when there is no bottom bar.
+    final totalH = max(viewH, poolTop + poolH + MediaQuery.paddingOf(context).bottom);
+    final moveDuration = Duration(milliseconds: _phase == _Phase.scramble ? 220 : 380);
+
     final children = <Widget>[
       for (var gi = 0; gi < g; gi++)
-        Positioned(
+        AnimatedPositioned(
+          key: ValueKey('group-$gi'),
+          duration: moveDuration,
+          curve: Curves.easeInOutCubic,
           left: boxPos(gi).dx,
           top: boxPos(gi).dy,
           width: colW,
@@ -238,11 +286,11 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
             width = colW - 16;
           } else {
             pos = poolPos(poolIndex[s.id]!);
-            width = _poolCardW;
+            width = poolCardW;
           }
           return AnimatedPositioned(
             key: ValueKey(s.id),
-            duration: Duration(milliseconds: _phase == _Phase.scramble ? 220 : 380),
+            duration: moveDuration,
             curve: Curves.easeInOutCubic,
             left: pos.dx,
             top: pos.dy,
@@ -259,7 +307,7 @@ class _DrawBodyState extends ConsumerState<_DrawBody> {
                   borderRadius: BorderRadius.circular(8),
                   boxShadow: const [BoxShadow(blurRadius: 2, color: Colors.black26, offset: Offset(0, 1))],
                 ),
-                child: Text(s.name, overflow: TextOverflow.ellipsis, style: const TextStyle(fontSize: 13)),
+                child: Text(s.name, overflow: TextOverflow.ellipsis, style: TextStyle(fontSize: narrow ? 12 : 13)),
               ),
             ),
           );
